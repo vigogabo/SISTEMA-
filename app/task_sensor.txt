@@ -1,0 +1,78 @@
+task_sensor_attribute.h contiene:
+
+
+	La tabla de estados y excitaciones definida para el diagrama de estados diseñado para el modelo del
+	pulsador. 
+	
+	task_sensor_ev: tipos enumerativos para los eventos definidos por el modelo (EV_BTN_XX_UP, EV_BTN_XX_DOWN)
+	task_sensor_st: tipos enumerativos para los estados definidos por el modelo (ST_BTN_XX_UP,ST_BTN_XX_FALLING,
+	ST_BTN_XX_DOWN,ST_BTN_XX_RISING)
+	
+	task_sensor_id: tipos enumerativos para los identificadores de los 7 pulsadores a utilizar. Previamente se
+	definió que GPIOS estaban disponibles para conectar los pulsadores externos y se seleccionó en el .ioc
+	
+    la declaración de los tipos estructuras de configuración (cfg) y datos (dta) de sensor
+    
+    task_sensor_cfg_t: estructura con punteros a campos relevantes para la implementacion del pulsador. Estos son:
+    	un campo para el identificador previamente definido
+		un puntero al puerto del pin a usar
+		un campo para el pin
+		un campo para definir el estado (pulsado o sin pulsar)
+		un campo para definir el tiempo maximo de debounce
+		un campo para definir la señal a enviar al sistema para el estado UP
+		un campo para definir la señal a enviar al sistema para el estado DOWN
+    	
+    task_sensor_dta_t: estructura de 3 campos que se actualiza mediante la ejecucion de task_sensor.c
+    cuyos campos son:
+    	un campo que indica el valor actual del tick
+    	un campo que indica el estado actual del diagrama de estados
+    	un campo que indica el evento actual del diagrama de estados    
+    
+
+
+
+
+task_sensor.c contiene:
+
+	task_sensor_cfg_list: lista de estructuras de configuracion de los sensores a utilizar. Se debe indicar los campos de cada sensor,
+	como el id, el puerto, el pin elegido entre otros.
+    de inicializacion,
+
+	task_sensor_dta_list: lista de estructuras de datos de los sensores a utilizar. Se debe inicializar los campos de cada sensor,
+	con el estado inicial segun el diagrama definido y se inicializan su variable tick y evento.
+	
+    la definicion de los tipos estructuras de configuración (cfg) y datos (dta) de tareas
+    
+    task_cfg_t: estructura con punteros a funciones relevantes de las tareas a implementar. Estos son:
+    	puntero al metodo de iniciacion de la tarea.
+    	puntero al metodo de actualizacion de la tarea.
+    	puntero void a parametros.
+    	
+    task_dta_t: estructura de un solo campo que guarda el peor tiempo de ejecucion de las tareas.
+    
+    task_cfg_list: lista de estructuras de configuracion de las tareas implementadas. Se debe indicar las funciones
+    de inicializacion, la funcion de actualizacion y la direccion del parametro necesario.
+    
+    Se define la cantidad de sensores, segun la cantidad de elementos en la lista de estructuras.
+    
+    el método task_sensor_init(), inicializa el ejecutor cíclico de sensores, donde:
+        se imprime por consola el método invocado 
+        se inicializa la estructura de datos (dta) de cada sensor
+        
+        
+    el método task_sensor_update(), recorre el ejecutor cíclico de sensores, donde:
+    	se lee el pin asociado a cada sensor mediante funciones de la HAL por el cual se define el evento.
+    	
+    	mediante un switch se implementa la tabla de estados y excitaciones en la cual:
+    	
+    		hay tantos case´s como estados tiene el statechart, donde:
+    		
+				cada case tiene tantos if , como transiciones salientes con ventos [guardas] tiene ese estado, donde:
+        
+        			en el cuerpo del if se puede: 
+        
+            			pasar al statechart siguiente (System) un signal (evento) invocando put_evet_task_...
+            			modificar la variable de estado del statechart
+            			modificar el tick del statechart
+    	
+  

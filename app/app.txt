@@ -1,0 +1,26 @@
+app.c contiene:
+
+    la declaración de los tipos estructuras de configuración (cfg) y datos (dta) de tareas
+    
+    task_cfg_t: estructura con punteros a funciones relevantes de las tareas a implementar. Estos son:
+    	puntero al metodo de iniciacion de la tarea.
+    	puntero al metodo de actualizacion de la tarea.
+    	puntero void a parametros.
+    	
+    task_dta_t: estructura de un solo campo que guarda el peor tiempo de ejecucion de las tareas.
+    
+    task_cfg_list: lista de estructuras de configuracion de las tareas implementadas. Se debe indicar las funciones
+    de inicializacion, la funcion de actualizacion y la direccion del parametro necesario.
+    
+    Se define la cantidad de tareas, segun la cantidad de elementos en la lista de estructuras.
+    
+    el método app_init(), inicializa el ejecutor cíclico de tareas, donde:
+        se ejecuta los métodos task_xxxx_init() de cada tarea 
+        se inicializa la estructura de datos (dta) de cada tarea
+        
+        
+    el método app_update(), recorre el ejecutor cíclico de tareas, donde:
+     	se ejecuta los métodos task_xxxx_update() de cada tarea 
+        se cuentan los ciclos que demora el ejecucion del metodo y 
+        de ser mayor al tiempo anterior que se ejecutó, se actualiza 
+        la estructura de datos (dta) de cada tarea
